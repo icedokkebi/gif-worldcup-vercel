@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GIF Worldcup</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #14141f;
+    --surface2: #1c1c2e;
+    --border: #2a2a3a;
+    --text: #e8e8f0;
+    --text-dim: #8888a0;
+    --accent: #ff3366;
+    --accent2: #6633ff;
+    --gold: #ffd700;
+    --green: #22c55e;
+    --red: #ef4444;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    padding: 30px 20px 10px;
+  }
+  .header h1 {
+    font-size: 2rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
+  }
+  .header .subtitle { color: var(--text-dim); margin-top: 4px; font-size: 0.85rem; }
+
+  /* ── Nav Tabs ── */
+  .nav-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 20px;
+    flex-wrap: wrap;
+  }
+  .nav-tab {
+    padding: 8px 20px;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-tab:hover { border-color: var(--accent); color: var(--text); }
+  .nav-tab.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    border-color: transparent;
+  }
+
+  /* ── Tab content ── */
+  .tab-content { display: none; padding: 0 20px 40px; max-width: 1200px; margin: 0 auto; }
+  .tab-content.active { display: block; }
+
+  /* ── Category Grid ── */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .cat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .cat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .cat-card .cat-name { font-weight: 700; font-size: 1rem; margin-bottom: 6px; text-transform: capitalize; }
+  .cat-card .cat-count { color: var(--text-dim); font-size: 0.8rem; }
+
+  /* ── Battle Screen ── */
+  .battle-wrap {
+    text-align: center;
+  }
+  .round-badge {
+    display: inline-block;
+    margin: 16px auto;
+    padding: 8px 28px;
+    border-radius: 100px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+  }
+  .match-info { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 16px; }
+
+  .battle-arena {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  @media (max-width: 640px) {
+    .battle-arena { grid-template-columns: 1fr; }
+  }
+
+  .battle-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .battle-card:hover { border-color: var(--accent); transform: scale(1.02); }
+  .battle-card:active { transform: scale(0.98); }
+
+  .battle-card .media-wrap {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .battle-card .media-wrap img,
+  .battle-card .media-wrap video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .battle-card .clip-info {
+    padding: 12px 16px;
+  }
+  .battle-card .clip-dialogue {
+    font-size: 0.85rem;
+    color: #fff;
+    background: rgba(0,0,0,0.7);
+    padding: 8px 12px;
+    text-align: center;
+    font-style: italic;
+    line-height: 1.4;
+    min-height: 2.8em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .battle-card .clip-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+  .battle-card .clip-category {
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    text-transform: capitalize;
+    margin-top: 2px;
+  }
+  .battle-card .sound-hint {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--text-dim);
+    transition: all 0.2s;
+    pointer-events: none;
+  }
+  .battle-card:hover .sound-hint { color: var(--green); }
+
+  .vs-text {
+    display: none;
+  }
+  @media (max-width: 640px) {
+    .vs-text {
+      display: block;
+      text-align: center;
+      font-weight: 900;
+      font-size: 1.5rem;
+      color: var(--accent);
+      margin: -8px 0;
+    }
+  }
+
+  /* ── Winner Screen ── */
+  .winner-screen {
+    text-align: center;
+    padding: 20px;
+  }
+  .winner-screen h2 {
+    font-size: 1.8rem;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--gold), #ff9900);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .winner-screen .winner-media {
+    max-width: 500px;
+    margin: 0 auto 16px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 3px solid var(--gold);
+  }
+  .winner-screen .winner-media img,
+  .winner-screen .winner-media video {
+    width: 100%;
+    display: block;
+  }
+  .winner-screen .winner-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; }
+
+  /* ── Buttons ── */
+  .btn {
+    padding: 10px 24px;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--accent); }
+  .btn-danger {
+    background: var(--red);
+    color: #fff;
+  }
+  .btn-danger:hover { opacity: 0.9; }
+  .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+  .btn + .btn { margin-left: 8px; }
+
+  /* ── Rankings Table ── */
+  .filter-bar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .filter-bar select {
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+
+  .rank-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .rank-table th {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 2px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .rank-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+    vertical-align: middle;
+  }
+  .rank-table tr:hover td { background: var(--surface); }
+  .rank-thumb {
+    width: 60px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .rank-thumb:hover { transform: scale(2.5); z-index: 10; position: relative; }
+  .rank-num { font-weight: 700; color: var(--text-dim); }
+  .rank-num.top1 { color: var(--gold); font-size: 1.1rem; }
+  .rank-num.top2 { color: #c0c0c0; }
+  .rank-num.top3 { color: #cd7f32; }
+  .win-rate-bar {
+    display: inline-block;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--accent);
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ── Manage Grid ── */
+  .manage-toolbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .manage-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+  }
+  .manage-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .manage-card:hover { border-color: var(--accent); }
+  .manage-card.selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  .manage-card .card-check {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.5);
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    font-size: 14px;
+  }
+  .manage-card.selected .card-check {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .manage-card .card-media {
+    aspect-ratio: 16/10;
+    overflow: hidden;
+    background: #000;
+  }
+  .manage-card .card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .manage-card .card-label {
+    padding: 8px;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── Stats ── */
+  .stat-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+  .stat-card .stat-value {
+    font-size: 2rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .stat-card .stat-label { color: var(--text-dim); font-size: 0.8rem; margin-top: 4px; }
+
+  .chart-section { margin-bottom: 24px; }
+  .chart-section h3 { font-size: 1rem; font-weight: 700; margin-bottom: 12px; }
+  .bar-chart { display: flex; flex-direction: column; gap: 6px; }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.8rem;
+  }
+  .bar-label {
+    width: 100px;
+    text-align: right;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    text-transform: capitalize;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .bar-fill-wrap {
+    flex: 1;
+    height: 20px;
+    background: var(--surface);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-size: 0.7rem;
+    color: #fff;
+    font-weight: 600;
+    min-width: fit-content;
+  }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 24px;
+  }
+  .modal h3 { margin-bottom: 16px; font-size: 1.1rem; }
+  .modal-cats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+  }
+  .modal-cat-btn {
+    padding: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.8rem;
+    text-transform: capitalize;
+    transition: all 0.2s;
+  }
+  .modal-cat-btn:hover { border-color: var(--accent); background: var(--accent); color: #fff; }
+
+  /* ── Preview Modal ── */
+  .preview-modal .modal {
+    max-width: 600px;
+  }
+  .preview-media {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+  .preview-meta { font-size: 0.85rem; color: var(--text-dim); }
+  .preview-meta span { color: var(--text); font-weight: 600; }
+
+  /* ── Pagination ── */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .page-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+  .page-btn:hover { border-color: var(--accent); }
+  .page-btn.active { background: var(--accent); border-color: var(--accent); }
+  .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    background: var(--green);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    z-index: 200;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.error { background: var(--red); }
+
+  /* ── Loading ── */
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-dim);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+  }
+  .empty-state .big { font-size: 3rem; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>GIF Worldcup</h1>
+  <div class="subtitle">GIF 이상형 월드컵 & 관리 대시보드</div>
+</div>
+
+<nav class="nav-tabs">
+  <button class="nav-tab active" data-tab="worldcup">월드컵</button>
+  <button class="nav-tab" data-tab="rankings">랭킹</button>
+  <button class="nav-tab" data-tab="stats">통계</button>
+</nav>
+
+<!-- ═══════════════ TAB: 월드컵 ═══════════════ -->
+<div id="tab-worldcup" class="tab-content active">
+  <!-- Phase: Category Select -->
+  <div id="wc-categories">
+    <div class="loading">카테고리 로딩 중...</div>
+  </div>
+
+  <!-- Phase: Battle -->
+  <div id="wc-battle" class="battle-wrap" style="display:none"></div>
+
+  <!-- Phase: Winner -->
+  <div id="wc-winner" class="winner-screen" style="display:none"></div>
+</div>
+
+<!-- ═══════════════ TAB: 랭킹 ═══════════════ -->
+<div id="tab-rankings" class="tab-content">
+  <div class="filter-bar">
+    <select id="rank-category"><option value="">전체</option></select>
+  </div>
+  <div id="rank-table-wrap"><div class="loading">로딩 중...</div></div>
+</div>
+
+
+<!-- ═══════════════ TAB: 통계 ═══════════════ -->
+<div id="tab-stats" class="tab-content">
+  <div id="stats-content"><div class="loading">로딩 중...</div></div>
+</div>
+
+<!-- ═══════════════ Preview Modal ═══════════════ -->
+<div class="modal-overlay preview-modal" id="preview-modal">
+  <div class="modal">
+    <div id="preview-content"></div>
+    <button class="btn btn-secondary" onclick="closePreview()">닫기</button>
+  </div>
+</div>
+
+<!-- ═══════════════ Toast ═══════════════ -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ──
+const state = {
+  playerId: localStorage.getItem('gif_wc_player_id') || crypto.randomUUID(),
+  categories: [],
+  allClips: [],
+  // Worldcup
+  sessionId: null,
+  bracket: [],
+  currentRound: [],
+  nextRound: [],
+  matchIndex: 0,
+  roundName: '',
+};
+localStorage.setItem('gif_wc_player_id', state.playerId);
+
+// ── Utils ──
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+
+function toast(msg, isError = false) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => t.className = 'toast', 2500);
+}
+
+// ── LocalStorage helpers ──
+function getVoteHistory() {
+  const stored = localStorage.getItem('gif_wc_votes');
+  return stored ? JSON.parse(stored) : [];
+}
+
+function addVote(winnerId, loserId, roundName, category) {
+  const votes = getVoteHistory();
+  votes.push({
+    winner_id: winnerId,
+    loser_id: loserId,
+    round_name: roundName,
+    category: category,
+    timestamp: new Date().toISOString(),
+  });
+  localStorage.setItem('gif_wc_votes', JSON.stringify(votes));
+}
+
+function getChampionships() {
+  const stored = localStorage.getItem('gif_wc_championships');
+  return stored ? JSON.parse(stored) : [];
+}
+
+function addChampionship(winnerId, category, bracketSize) {
+  const winner = state.allClips.find(c => c.id === winnerId);
+  if (!winner) return;
+
+  const championships = getChampionships();
+  championships.unshift({
+    winner: winner,
+    category: category,
+    bracket_size: bracketSize,
+    finished_at: new Date().toISOString(),
+  });
+  // Keep only last 50
+  if (championships.length > 50) championships.length = 50;
+  localStorage.setItem('gif_wc_championships', JSON.stringify(championships));
+}
+
+function calculateRankings(category = '') {
+  const votes = getVoteHistory();
+  const stats = {};
+
+  // Initialize stats for all clips
+  state.allClips.forEach(clip => {
+    if (category && clip.category !== category) return;
+    stats[clip.id] = {
+      ...clip,
+      win_count: 0,
+      play_count: 0,
+      win_rate: 0,
+    };
+  });
+
+  // Count wins and plays
+  votes.forEach(vote => {
+    if (category && stats[vote.winner_id]?.category !== category) return;
+
+    if (stats[vote.winner_id]) {
+      stats[vote.winner_id].win_count++;
+      stats[vote.winner_id].play_count++;
+    }
+    if (stats[vote.loser_id]) {
+      stats[vote.loser_id].play_count++;
+    }
+  });
+
+  // Calculate win rate and sort
+  const rankings = Object.values(stats).map(s => {
+    s.win_rate = s.play_count > 0 ? Math.round((s.win_count / s.play_count) * 100) : 0;
+    return s;
+  });
+
+  // Sort by win_rate desc, then win_count desc
+  rankings.sort((a, b) => {
+    if (b.win_rate !== a.win_rate) return b.win_rate - a.win_rate;
+    return b.win_count - a.win_count;
+  });
+
+  return rankings;
+}
+
+function mediaEl(clip, { battle = false } = {}) {
+  if (clip.mp4_url) {
+    if (battle) {
+      // Battle mode: paused+muted initially, hover activates
+      return `<video src="${clip.mp4_url}" loop muted playsinline preload="auto"></video>`;
+    }
+    return `<video src="${clip.mp4_url}" autoplay loop muted playsinline></video>`;
+  }
+  return `<img src="${clip.gif_url}" alt="${clip.movie_title}">`;
+}
+
+// ── Tab Navigation ──
+$$('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    $$('.nav-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    $$('.tab-content').forEach(c => c.classList.remove('active'));
+    $(`#tab-${tab.dataset.tab}`).classList.add('active');
+
+    if (tab.dataset.tab === 'rankings') loadRankings();
+    if (tab.dataset.tab === 'stats') loadStats();
+  });
+});
+
+// ══════════════════════════════════
+//  WORLDCUP
+// ══════════════════════════════════
+
+async function loadCategories() {
+  try {
+    const response = await fetch('/public/data.json');
+    if (!response.ok) throw new Error('Failed to load data.json');
+    const data = await response.json();
+
+    state.categories = data.categories;
+    state.allClips = data.clips;
+    renderCategories();
+  } catch (e) {
+    $('#wc-categories').innerHTML = `<div class="empty-state">카테고리 로드 실패: ${e.message}</div>`;
+  }
+}
+
+function renderCategories() {
+  const el = $('#wc-categories');
+  if (!state.categories.length) {
+    el.innerHTML = '<div class="empty-state"><div class="big">?</div>카테고리가 없습니다. 재스캔 해주세요.</div>';
+    return;
+  }
+  el.innerHTML = `
+    <div class="cat-grid">
+      ${state.categories.map(c => `
+        <div class="cat-card" onclick="startWorldcup('${c.name}', ${c.count})">
+          <div class="cat-name">${c.name}</div>
+          <div class="cat-count">${c.count}개</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function startWorldcup(category, count) {
+  const bracketSize = count >= 16 ? 16 : 8;
+  try {
+    // Get clips for this category
+    const categoryClips = state.allClips.filter(c => c.category === category);
+
+    // Shuffle and select random clips for bracket
+    const shuffled = [...categoryClips].sort(() => Math.random() - 0.5);
+    state.bracket = shuffled.slice(0, bracketSize);
+
+    state.sessionId = crypto.randomUUID();
+    state.currentRound = [...state.bracket];
+    state.nextRound = [];
+    state.matchIndex = 0;
+    state.roundName = bracketSize === 16 ? '16강' : '8강';
+    state.currentCategory = category;
+
+    $('#wc-categories').style.display = 'none';
+    $('#wc-battle').style.display = 'block';
+    $('#wc-winner').style.display = 'none';
+    renderBattle();
+  } catch (e) {
+    toast(e.message, true);
+  }
+}
+
+function renderBattle() {
+  const el = $('#wc-battle');
+  const a = state.currentRound[state.matchIndex * 2];
+  const b = state.currentRound[state.matchIndex * 2 + 1];
+  const totalMatches = Math.floor(state.currentRound.length / 2);
+
+  el.innerHTML = `
+    <div class="round-badge">${state.roundName}</div>
+    <div class="match-info">${state.matchIndex + 1} / ${totalMatches}</div>
+    <div class="battle-arena">
+      <div class="battle-card" onclick="vote(${a.id}, ${b.id})">
+        ${a.mp4_url ? '<div class="sound-hint">&#x1f50a;</div>' : ''}
+        <div class="media-wrap">${mediaEl(a, { battle: true })}</div>
+        ${a.dialogue_text ? `<div class="clip-dialogue">"${a.dialogue_text}"</div>` : ''}
+        <div class="clip-info">
+          <div class="clip-title">${a.movie_title}</div>
+          <div class="clip-category">${a.category}</div>
+        </div>
+      </div>
+      <div class="vs-text">VS</div>
+      <div class="battle-card" onclick="vote(${b.id}, ${a.id})">
+        ${b.mp4_url ? '<div class="sound-hint">&#x1f50a;</div>' : ''}
+        <div class="media-wrap">${mediaEl(b, { battle: true })}</div>
+        ${b.dialogue_text ? `<div class="clip-dialogue">"${b.dialogue_text}"</div>` : ''}
+        <div class="clip-info">
+          <div class="clip-title">${b.movie_title}</div>
+          <div class="clip-category">${b.category}</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Hover-to-play with sound for battle cards
+  el.querySelectorAll('.battle-card').forEach(card => {
+    const video = card.querySelector('video');
+    if (!video) return;
+
+    card.addEventListener('mouseenter', () => {
+      video.muted = false;
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    });
+    card.addEventListener('mouseleave', () => {
+      video.muted = true;
+    });
+    // Mobile: tap once to play with sound, tap again to vote (handled by onclick)
+    card.addEventListener('touchstart', () => {
+      // Unmute whichever card is touched, mute the other
+      el.querySelectorAll('.battle-card video').forEach(v => { v.muted = true; });
+      video.muted = false;
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    }, { passive: true });
+  });
+}
+
+function vote(winnerId, loserId) {
+  try {
+    // Save vote to localStorage
+    addVote(winnerId, loserId, state.roundName, state.currentCategory);
+
+    // Add winner to next round
+    const winner = state.currentRound.find(c => c.id === winnerId);
+    state.nextRound.push(winner);
+
+    state.matchIndex++;
+    const totalMatches = Math.floor(state.currentRound.length / 2);
+
+    if (state.matchIndex >= totalMatches) {
+      // Round complete
+      if (state.nextRound.length === 1) {
+        // Tournament finished!
+        finishTournament(winnerId);
+        return;
+      }
+      // Next round
+      state.currentRound = [...state.nextRound];
+      state.nextRound = [];
+      state.matchIndex = 0;
+
+      if (state.currentRound.length === 2) state.roundName = '결승';
+      else if (state.currentRound.length === 4) state.roundName = '준결승';
+      else if (state.currentRound.length === 8) state.roundName = '8강';
+      else state.roundName = `${state.currentRound.length}강`;
+    }
+
+    renderBattle();
+  } catch (e) {
+    toast(e.message, true);
+  }
+}
+
+function finishTournament(winnerId) {
+  try {
+    // Save championship to localStorage
+    addChampionship(winnerId, state.currentCategory, state.bracket.length);
+
+    const winner = state.allClips.find(c => c.id === winnerId);
+    $('#wc-battle').style.display = 'none';
+    const el = $('#wc-winner');
+    el.style.display = 'block';
+    const winnerMedia = winner.mp4_url
+      ? `<video src="${winner.mp4_url}" autoplay loop playsinline controls></video>`
+      : `<img src="${winner.gif_url}" alt="">`;
+    el.innerHTML = `
+      <h2>WINNER!</h2>
+      <div class="winner-media">${winnerMedia}</div>
+      <div class="winner-title">${winner.movie_title}</div>
+      <p style="color:var(--text-dim);margin-bottom:20px;">${winner.category}</p>
+      <button class="btn btn-primary" onclick="resetWorldcup()">다시하기</button>
+    `;
+  } catch (e) {
+    toast(e.message, true);
+  }
+}
+
+function resetWorldcup() {
+  $('#wc-categories').style.display = 'block';
+  $('#wc-battle').style.display = 'none';
+  $('#wc-winner').style.display = 'none';
+  loadCategories();
+}
+
+// ══════════════════════════════════
+//  RANKINGS
+// ══════════════════════════════════
+
+function loadRankings() {
+  // Populate category dropdown
+  const sel = $('#rank-category');
+  if (sel.options.length <= 1 && state.categories.length) {
+    state.categories.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.name;
+      opt.textContent = `${c.name} (${c.count})`;
+      sel.appendChild(opt);
+    });
+  }
+
+  const cat = sel.value;
+  try {
+    const rankings = calculateRankings(cat);
+    renderRankings(rankings);
+  } catch (e) {
+    $('#rank-table-wrap').innerHTML = `<div class="empty-state">로드 실패: ${e.message}</div>`;
+  }
+}
+
+function renderRankings(clips) {
+  if (!clips.length) {
+    $('#rank-table-wrap').innerHTML = '<div class="empty-state">데이터 없음</div>';
+    return;
+  }
+
+  const playedClips = clips.filter(c => c.play_count > 0);
+  const unplayedClips = clips.filter(c => c.play_count === 0);
+  const maxRate = Math.max(...playedClips.map(c => c.win_rate), 1);
+
+  let html = `<table class="rank-table">
+    <thead><tr>
+      <th>#</th><th>미리보기</th><th>영화</th><th>카테고리</th><th>승률</th><th>승/출전</th>
+    </tr></thead><tbody>`;
+
+  playedClips.forEach((c, i) => {
+    const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : '';
+    const barW = c.win_rate / maxRate * 100;
+    html += `<tr>
+      <td><span class="rank-num ${rankClass}">${i + 1}</span></td>
+      <td><img class="rank-thumb" src="${c.gif_url}" alt="" onclick="openPreview(${JSON.stringify(c).replace(/"/g, '&quot;')})"></td>
+      <td>${c.movie_title}</td>
+      <td style="text-transform:capitalize;">${c.category}</td>
+      <td><span class="win-rate-bar" style="width:${barW}px"></span>${c.win_rate}%</td>
+      <td>${c.win_count}/${c.play_count}</td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+
+  if (unplayedClips.length) {
+    html += `<p style="color:var(--text-dim);margin-top:16px;font-size:0.8rem;">미출전 ${unplayedClips.length}개</p>`;
+  }
+
+  $('#rank-table-wrap').innerHTML = html;
+}
+
+$('#rank-category').addEventListener('change', loadRankings);
+
+// ══════════════════════════════════
+//  PREVIEW
+// ══════════════════════════════════
+
+function openPreview(clip) {
+  const el = $('#preview-content');
+  const mp4 = clip.mp4_url;
+  el.innerHTML = `
+    ${mp4
+      ? `<video class="preview-media" src="${mp4}" autoplay loop muted playsinline controls></video>`
+      : `<img class="preview-media" src="${clip.gif_url}" alt="">`
+    }
+    <div class="preview-meta">
+      <p>영화: <span>${clip.movie_title}</span></p>
+      <p>카테고리: <span style="text-transform:capitalize;">${clip.category}</span></p>
+      ${clip.win_rate !== undefined ? `<p>승률: <span>${clip.win_rate}%</span> (${clip.win_count}/${clip.play_count})</p>` : ''}
+    </div>
+  `;
+  $('#preview-modal').classList.add('show');
+}
+
+function closePreview() { $('#preview-modal').classList.remove('show'); }
+
+// Close modals on overlay click
+$('#preview-modal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) e.currentTarget.classList.remove('show');
+});
+
+// ══════════════════════════════════
+//  STATS
+// ══════════════════════════════════
+
+function loadStats() {
+  try {
+    const votes = getVoteHistory();
+    const championships = getChampionships();
+    const rankings = calculateRankings();
+
+    // Calculate stats
+    const totalClips = state.allClips.length;
+    const totalCategories = state.categories.length;
+    const totalVotes = votes.length;
+    const totalChampionships = championships.length;
+
+    // Get top 10 by win count
+    const top10 = rankings.filter(r => r.play_count > 0).slice(0, 10);
+
+    const d = {
+      total_clips: totalClips,
+      categories: state.categories,
+      total_sessions: totalChampionships,
+      finished_sessions: totalChampionships,
+      top10: top10,
+      championships: championships,
+    };
+
+    renderStats(d);
+  } catch (e) {
+    $('#stats-content').innerHTML = `<div class="empty-state">로드 실패: ${e.message}</div>`;
+  }
+}
+
+function renderStats(d) {
+  const completion = d.total_sessions ? Math.round(d.finished_sessions / d.total_sessions * 100) : 0;
+  const maxCat = Math.max(...d.categories.map(c => c.count), 1);
+
+  let html = `
+    <div class="stat-cards">
+      <div class="stat-card"><div class="stat-value">${d.total_clips.toLocaleString()}</div><div class="stat-label">총 GIF 수</div></div>
+      <div class="stat-card"><div class="stat-value">${d.categories.length}</div><div class="stat-label">카테고리</div></div>
+      <div class="stat-card"><div class="stat-value">${d.total_sessions}</div><div class="stat-label">총 월드컵 세션</div></div>
+      <div class="stat-card"><div class="stat-value">${completion}%</div><div class="stat-label">완료율 (${d.finished_sessions}/${d.total_sessions})</div></div>
+    </div>
+
+    <div class="chart-section">
+      <h3>카테고리별 분포</h3>
+      <div class="bar-chart">
+        ${d.categories.map(c => `
+          <div class="bar-row">
+            <span class="bar-label">${c.name}</span>
+            <div class="bar-fill-wrap">
+              <div class="bar-fill" style="width:${c.count / maxCat * 100}%">${c.count}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  if (d.top10.length) {
+    html += `
+      <div class="chart-section">
+        <h3>Most Wins Top 10</h3>
+        <table class="rank-table">
+          <thead><tr><th>#</th><th>미리보기</th><th>영화</th><th>카테고리</th><th>승률</th><th>승/출전</th></tr></thead>
+          <tbody>
+            ${d.top10.map((c, i) => `
+              <tr>
+                <td><span class="rank-num ${i < 3 ? ['top1','top2','top3'][i] : ''}">${i + 1}</span></td>
+                <td><img class="rank-thumb" src="${c.gif_url}" alt=""></td>
+                <td>${c.movie_title}</td>
+                <td style="text-transform:capitalize;">${c.category}</td>
+                <td>${c.win_rate}%</td>
+                <td>${c.win_count}/${c.play_count}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  if (d.championships && d.championships.length) {
+    html += `
+      <div class="chart-section">
+        <h3>🏆 우승 기록 (최근 ${d.championships.length}개 대회)</h3>
+        <table class="rank-table">
+          <thead><tr><th>#</th><th>미리보기</th><th>영화</th><th>카테고리</th><th>bracket</th><th>우승 시각</th></tr></thead>
+          <tbody>
+            ${d.championships.map((ch, i) => {
+              const date = new Date(ch.finished_at);
+              const timeStr = date.toLocaleString('ko-KR', {
+                month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+              });
+              return `
+                <tr>
+                  <td><span class="rank-num ${i < 3 ? ['top1','top2','top3'][i] : ''}">${i + 1}</span></td>
+                  <td><img class="rank-thumb" src="${ch.winner.gif_url}" alt="" onclick='openPreview(${JSON.stringify(ch.winner).replace(/'/g, "&apos;")})'></td>
+                  <td>${ch.winner.movie_title}</td>
+                  <td style="text-transform:capitalize;">${ch.category}</td>
+                  <td>${ch.bracket_size}강</td>
+                  <td style="font-size:0.75rem;color:var(--text-dim);">${timeStr}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  $('#stats-content').innerHTML = html;
+}
+
+// ── Keyboard shortcuts ──
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closePreview();
+  }
+});
+
+// ── Init ──
+loadCategories();
+</script>
+</body>
+</html>

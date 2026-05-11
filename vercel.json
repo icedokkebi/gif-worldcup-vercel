@@ -1,6 +1,9 @@
 {
   "version": 2,
   "public": true,
+  "buildCommand": null,
+  "outputDirectory": ".",
+  "installCommand": null,
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [

@@ -1,0 +1,11 @@
+{
+  "name": "gif-worldcup-vercel",
+  "version": "1.0.0",
+  "description": "GIF 이상형 월드컵 - 영화 대사 GIF로 하는 토너먼트 게임",
+  "scripts": {
+    "build": "echo 'No build needed - static site'"
+  },
+  "keywords": ["gif", "worldcup", "tournament", "movies"],
+  "author": "icedokkebi",
+  "license": "MIT"
+}
